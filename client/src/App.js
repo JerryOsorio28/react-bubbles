@@ -11,7 +11,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   const [colorList, setColorList] = useState([]);
-
+  console.log(colorList)
   return (
     <Router>
       <div className="App">
