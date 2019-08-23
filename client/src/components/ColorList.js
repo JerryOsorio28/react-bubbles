@@ -1,31 +1,64 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
+import axios from 'axios';
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList = ({ colors, updateColors, props, setColorList }) => {
+  console.log('from colorList', props);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+
+  // console.log(colorToEdit)
 
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
   };
 
+  useEffect(() => {
+
+      const id = props.match.params.id;
+      console.log('ID', id)
+
+      const colorsList = colors.find( color => `${color.id}` === id);
+
+    if(colorsList) setColorToEdit(colorsList)
+  }, [colors, props.match.params.id])
+
   const saveEdit = e => {
     e.preventDefault();
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+    axiosWithAuth()
+      .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit) 
+      .then(res => {console.log('axios from saveEdit', res)
+        setColorList(props.match.params.id)
+      })
+      // .catch(err => console.log(err. response))
   };
+  
+  const removeColor = id => {
+    setColorList(colorToEdit.filter(color => color.id != id))
+  }
 
   const deleteColor = color => {
     // make a delete request to delete this color
+    const colorToDelete = props.match.params.id;
+    console.log('colortoDelete', props)
+
+    axiosWithAuth
+      .delete(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
+        .then( res => {console.log('axios from deleteColor', res)
+          deleteColor(colorToEdit.id)
+        })
+        .catch(err => console.log(err.response))
   };
+
 
   return (
     <div className="colors-wrap">
