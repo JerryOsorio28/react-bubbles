@@ -17,8 +17,9 @@ function App() {
       <div className="App">
         <Route exact path="/" component={Login} />
         <PrivateRoute 
-          exact path ='/BubblePage' 
+          exact path ='/colors' 
           component={BubblePage}
+          setColorList={setColorList}
         />
       </div>
     </Router>

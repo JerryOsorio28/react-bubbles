@@ -6,26 +6,23 @@ const initialColor = {
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors, props, setColorList }) => {
+const ColorList = ({ colors, updateColors, props }) => {
   console.log('from colorList', props);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
-
-  // console.log(colorToEdit)
 
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
   };
 
-  useEffect(() => {
+  useEffect(() => { 
 
-      const id = props.match.params.id;
-      console.log('ID', id)
+     const id = props.match.params.id //<-- is coming back undefined???
 
-      const colorsList = colors.find( color => `${color.id}` === id);
+      const colorInList = colors.find( color => `${color.id}` === color.id); 
 
-    if(colorsList) setColorToEdit(colorsList)
+    if(colorInList) setColorToEdit(colorInList)
   }, [colors, props.match.params.id])
 
   const saveEdit = e => {
@@ -36,27 +33,27 @@ const ColorList = ({ colors, updateColors, props, setColorList }) => {
     axiosWithAuth()
       .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit) 
       .then(res => {console.log('axios from saveEdit', res)
-        setColorList(props.match.params.id)
+      updateColors(res.data)
+      setColorToEdit(initialColor) //<---resets Form
       })
-      // .catch(err => console.log(err. response))
+      .catch(err => console.log(err. response))
   };
   
   const removeColor = id => {
-    setColorList(colorToEdit.filter(color => color.id !== id))
+    updateColors(colorToEdit.filter(color => color.id !== id))
   }
 
   const deleteColor = color => {
     // make a delete request to delete this color
     console.log('colortoDelete', color)
-
     axiosWithAuth()
       .delete(`http://localhost:5000/api/colors/${color.id}`, color)
         .then( res => {console.log('axios from deleteColor', res)
-          deleteColor(color.id)
+          removeColor(color.id)
+          props.history.push('/colors')
         })
         .catch(err => console.log(err.response))
   };
-
 
   return (
     <div className="colors-wrap">
